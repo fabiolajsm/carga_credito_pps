@@ -31,7 +31,10 @@
                 "output": "assets"
               }
             ],
-            "styles": ["src/global.scss"],
+            "styles": [
+              "src/global.scss",
+              "node_modules/ngx-spinner/animations/ball-grid-beat.css"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -126,9 +129,7 @@
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@ionic/angular-toolkit"
-    ],
+    "schematicCollections": ["@ionic/angular-toolkit"],
     "analytics": false
   },
   "schematics": {
