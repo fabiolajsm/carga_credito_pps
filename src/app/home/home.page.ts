@@ -59,10 +59,16 @@ export class HomePage implements OnInit {
 
   async loadUser() {
     this.spinner.show();
-    this.auth.getCurrentUser().subscribe((user) => {
-      this.user = user;
-      this.spinner.hide();
-    });
+    this.auth.getCurrentUser().subscribe(
+      (user) => {
+        this.user = user;
+        this.spinner.hide();
+      },
+      (error) => {
+        this.spinner.hide();
+        console.error('Error al cargar el usuario', error);
+      }
+    );
   }
 
   onSelectCreditsChange(value: number) {
