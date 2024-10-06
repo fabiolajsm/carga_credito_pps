@@ -52,3 +52,18 @@ div > button:hover {
   margin-left: 10px;
   margin-right: 10px;
 }
+
+/* Animación de desvanecimiento */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Clase para aplicar la animación */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
