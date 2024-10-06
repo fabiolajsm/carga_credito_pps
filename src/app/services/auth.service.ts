@@ -1,19 +1,28 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import {
+  Auth,
+  authState,
+  signInWithEmailAndPassword,
+} from '@angular/fire/auth';
 import { collection, getDocs, query, where } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { getAuth } from 'firebase/auth';
 
 import { UserInterface } from '../interfaces/user.interface';
-import { Observable, from } from 'rxjs';
+import { Observable, from, map, of, switchMap } from 'rxjs';
 import { Firestore } from '@angular/fire/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   firestore = inject(Firestore);
-  constructor(private firebaseAuth: Auth, private router: Router) {}
+  firebaseAuth = inject(Auth);
+
+  userCollectionName = 'users';
+  historyCollectionName = 'loginHistory';
+  constructor(private router: Router) {}
 
   login(email: string, password: string) {
     const promise = signInWithEmailAndPassword(
@@ -28,8 +37,18 @@ export class AuthService {
     this.firebaseAuth.signOut().then(() => this.router.navigate(['login']));
   }
 
-  getCurrentUserEmail() {
-    return getAuth().currentUser?.email;
+  getCurrentUser(): Observable<UserInterface | undefined> {
+    return authState(this.firebaseAuth).pipe(
+      switchMap((user) => {
+        if (user) {
+          return this.getUserByEmail(user.email!).pipe(
+            map((userData) => userData)
+          );
+        } else {
+          return of(undefined);
+        }
+      })
+    );
   }
 
   getUserByEmail(email: string): Observable<UserInterface | undefined> {
@@ -50,5 +69,11 @@ export class AuthService {
           observer.error(error);
         });
     });
+  }
+
+  async updateUser(user: UserInterface) {
+    if (!user) return;
+    const docsUser = doc(collection(this.firestore, 'users'), user.id);
+    updateDoc(docsUser, { codes: user.codes, credito: user.credito });
   }
 }

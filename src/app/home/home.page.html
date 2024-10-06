@@ -1,20 +1,61 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title slot="start"> Carga de crédito </ion-title>
+    <ion-button fill="clear" slot="end" (click)="handleLogout()">
+      <ion-icon aria-hidden="true" name="log-in-outline"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="centered-content">
+  <div *ngIf="user" class="user-info card">
+    <img src="assets/tarjeta.png" alt="imagen tarjeta" class="card-image" />
+    <p class="cookieHeading">
+      Créditos: {{ user.credito && user.credito > 0 ? user.credito : 0 }}
+    </p>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <ion-select
+      label="Seleccionar Créditos"
+      label-placement="floating"
+      [(ngModel)]="selectedCredits"
+      (ionChange)="onSelectCreditsChange($event.detail.value)"
+    >
+      <ion-select-option value="10">10 Créditos</ion-select-option>
+      <ion-select-option value="50">50 Créditos</ion-select-option>
+      <ion-select-option value="100">100 Créditos</ion-select-option>
+    </ion-select>
+
+    <div class="button-container">
+      <ion-button
+        class="action-button"
+        (click)="showScanner()"
+        [disabled]="!selectedCredits"
+      >
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Acreditar créditos
+      </ion-button>
+      <ion-button class="action-button" (click)="performReset()" fill="outline">
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
+        Limpiar créditos
+      </ion-button>
+    </div>
+
+    <div *ngIf="scanning" class="scanner-container">
+      <p>Escanea el código QR</p>
+      <img
+        src="assets/scan{{scanImage}}.png"
+        alt="Escanear QR"
+        class="scan-image"
+      />
+    </div>
   </div>
 </ion-content>
+
+<ngx-spinner
+  bdColor="rgba(0, 0, 0, 0.8)"
+  size="medium"
+  color="#d9d9d9"
+  type="ball-grid-beat"
+  [fullScreen]="true"
+  ><p style="color: #d9d9d9; font-family: Ubuntu">Cargando...</p>
+</ngx-spinner>

@@ -76,7 +76,7 @@ export class LoginPage {
       next: () => {
         this.spinner.hide();
         this.errorMessage = undefined;
-        this.router.navigateByUrl('');
+        this.router.navigateByUrl('home');
         this.form.controls['email'].setValue('');
         this.form.controls['password'].setValue('');
       },
