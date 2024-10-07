@@ -18,6 +18,10 @@ import { AuthService } from '../services/auth.service';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { Capacitor, Plugins } from '@capacitor/core';
+
+const { App } = Plugins;
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -42,7 +46,7 @@ export class HomePage implements OnInit {
   user: UserInterface | undefined;
   codigo!: string;
   selectedCredits: number | undefined;
-  scanning: boolean = false; // Nueva propiedad para controlar el escáner
+  scanning: boolean = false;
   userSubscription!: Subscription;
   scanImage = '';
 
@@ -52,9 +56,8 @@ export class HomePage implements OnInit {
 
   async ngOnInit() {
     await this.loadUser();
-    BarcodeScanner.isSupported().then((result) => {
-      this.isSupported = result.supported;
-    });
+    const result = await BarcodeScanner.isSupported();
+    this.isSupported = result.supported;
   }
 
   async loadUser() {
@@ -72,62 +75,54 @@ export class HomePage implements OnInit {
   }
 
   onSelectCreditsChange(value: number) {
-    this.selectedCredits = value;
+    this.selectedCredits = Number(value);
     this.scanImage = value.toString();
-  }
 
-  showScanner() {
-    this.scanning = true;
-    this.scan(); // Llamar al método de escaneo
+    switch (Number(value)) {
+      case 10:
+        this.codigo = '8c95def646b6127282ed50454b73240300dccabc';
+        break;
+      case 50:
+        this.codigo = 'ae338e4e0cbb4e4bcffaf9ce5b409feb8edd5172';
+        break;
+      case 100:
+        this.codigo = '2786f4877b9091dcad7f35751bfcf5d5ea712b2f';
+        break;
+      default:
+        this.codigo = '';
+        break;
+    }
   }
 
   async scan(): Promise<void> {
-    this.spinner.show();
     const granted = await this.requestPermissions();
     if (!granted) {
-      this.presentAlert();
-      this.spinner.hide();
+      await this.presentAlert();
+      this.scanning = false;
       return;
     }
-
-    const { barcodes } = await BarcodeScanner.scan();
-    if (barcodes.length > 0) {
-      this.codigo = barcodes[0].rawValue;
-      await this.credits(); // Agregar créditos después de escanear
-    }
-
-    this.scanning = false; // Ocultar el escáner después de escanear
-    this.spinner.hide();
+    await this.credits();
   }
 
   async credits() {
-    if (!this.user || !this.selectedCredits) return;
+    this.scanning = true;
+
+    if (!this.user || !this.selectedCredits || !this.codigo) return;
 
     const cantidadCargas = this.user.perfil === 'admin' ? 2 : 1;
     const codigoYaUsado = this.countOccurrences(this.user.codes, this.codigo);
 
     if (codigoYaUsado < cantidadCargas) {
-      switch (this.codigo.trim()) {
-        case '8c95def646b6127282ed50454b73240300dccabc':
-          this.user.credito += this.selectedCredits; // Usar el valor seleccionado
-          break;
-        case 'ae338e4e0cbb4e4bcffaf9ce5b409feb8edd5172':
-          this.user.credito += this.selectedCredits; // Usar el valor seleccionado
-          break;
-        case '2786f4877b9091dcad7f35751bfcf5d5ea712b2f':
-          this.user.credito += this.selectedCredits; // Usar el valor seleccionado
-          break;
-        default:
-          Swal.fire({
-            title: 'Código no válido',
-            text: 'El código QR escaneado no es válido.',
-            icon: 'error',
-          });
-          return;
-      }
-
+      this.user.credito += this.selectedCredits;
       this.user.codes.push(this.codigo);
       await this.auth.updateUser(this.user);
+      Swal.fire({
+        heightAuto: false,
+        title: 'Créditos acreditados',
+        text: `Se han acreditado ${this.selectedCredits} créditos.`,
+        icon: 'success',
+      });
+      this.scanning = true;
     } else {
       Swal.fire({
         heightAuto: false,
@@ -135,6 +130,7 @@ export class HomePage implements OnInit {
         text: `No puede utilizar más de ${cantidadCargas} vez este código QR`,
         confirmButtonText: 'ok',
       });
+      this.scanning = true;
     }
   }
 
@@ -168,6 +164,7 @@ export class HomePage implements OnInit {
         text: 'Tus créditos han sido limpiados.',
         confirmButtonText: 'ok',
       });
+      this.scanning = false;
     }
   }
 
@@ -177,13 +174,25 @@ export class HomePage implements OnInit {
   }
 
   async presentAlert(): Promise<void> {
-    Swal.fire({
+    const result = await Swal.fire({
       heightAuto: false,
       title: 'Permiso denegado',
       text: 'Por favor, otorgue permisos a la aplicación para usar la cámara.',
       icon: 'error',
-      confirmButtonText: 'ok',
+      showCancelButton: true,
+      confirmButtonText: 'Configuración',
+      cancelButtonText: 'Cancelar',
     });
+
+    if (result.isConfirmed) {
+      this.openAppSettings();
+    }
+  }
+
+  openAppSettings() {
+    if (Capacitor.isNativePlatform()) {
+      App['openUrl']({ url: 'app-settings:' });
+    }
   }
 
   handleLogout() {
