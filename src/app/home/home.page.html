@@ -42,11 +42,11 @@
 
     <div *ngIf="scanning" class="scanner-container">
       <p>Escanea el código QR</p>
-      <img
-        src="assets/scan{{scanImage}}.png"
-        alt="Escanear QR"
-        class="scan-image"
-      />
+      <qr-code
+        [value]="scanningMessage"
+        size="300"
+        errorCorrectionLevel="M"
+      ></qr-code>
     </div>
   </div>
 </ion-content>

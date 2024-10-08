@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Capacitor, Plugins } from '@capacitor/core';
-
+import { QrCodeModule } from 'ng-qrcode';
 const { App } = Plugins;
 
 @Component({
@@ -38,6 +38,7 @@ const { App } = Plugins;
     IonSelect,
     IonSelectOption,
     NgxSpinnerModule,
+    QrCodeModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -49,6 +50,7 @@ export class HomePage implements OnInit {
   scanning: boolean = false;
   userSubscription!: Subscription;
   scanImage = '';
+  scanningMessage = 'Proceso completo. Por favor volver a la app';
 
   constructor(private auth: AuthService, public spinner: NgxSpinnerService) {
     addIcons({ logInOutline, addCircleOutline, trashOutline });
@@ -95,12 +97,12 @@ export class HomePage implements OnInit {
   }
 
   async scan(): Promise<void> {
-    const granted = await this.requestPermissions();
-    if (!granted) {
-      await this.presentAlert();
-      this.scanning = false;
-      return;
-    }
+    // const granted = await this.requestPermissions();
+    // if (!granted) {
+    //   await this.presentAlert();
+    //   this.scanning = false;
+    //   return;
+    // }
     await this.credits();
   }
 
@@ -112,15 +114,23 @@ export class HomePage implements OnInit {
     const cantidadCargas = this.user.perfil === 'admin' ? 2 : 1;
     const codigoYaUsado = this.countOccurrences(this.user.codes, this.codigo);
 
+    await new Promise((resolve) => setTimeout(resolve, 8000));
+
     if (codigoYaUsado < cantidadCargas) {
+      this.spinner.show();
       this.user.credito += this.selectedCredits;
       this.user.codes.push(this.codigo);
       await this.auth.updateUser(this.user);
+      this.spinner.hide();
       Swal.fire({
         heightAuto: false,
         title: 'Créditos acreditados',
         text: `Se han acreditado ${this.selectedCredits} créditos.`,
         icon: 'success',
+        customClass: {
+          title: 'custom-alert-title',
+          confirmButton: 'custom-alert-confirm-btn ',
+        },
       });
       this.scanning = true;
     } else {
@@ -129,6 +139,10 @@ export class HomePage implements OnInit {
         title: 'Código utilizado',
         text: `No puede utilizar más de ${cantidadCargas} vez este código QR`,
         confirmButtonText: 'ok',
+        customClass: {
+          title: 'custom-alert-title',
+          confirmButton: 'custom-alert-confirm-btn ',
+        },
       });
       this.scanning = true;
     }
@@ -152,6 +166,10 @@ export class HomePage implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, limpiar',
       cancelButtonText: 'No, cancelar',
+      customClass: {
+        title: 'custom-alert-title',
+        confirmButton: 'custom-alert-confirm-btn ',
+      },
     });
 
     if (confirm.isConfirmed) {
@@ -163,6 +181,10 @@ export class HomePage implements OnInit {
         title: 'Limpiado',
         text: 'Tus créditos han sido limpiados.',
         confirmButtonText: 'ok',
+        customClass: {
+          title: 'custom-alert-title',
+          confirmButton: 'custom-alert-confirm-btn ',
+        },
       });
       this.scanning = false;
     }
@@ -182,6 +204,10 @@ export class HomePage implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Configuración',
       cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'custom-alert-title',
+        confirmButton: 'custom-alert-confirm-btn ',
+      },
     });
 
     if (result.isConfirmed) {
