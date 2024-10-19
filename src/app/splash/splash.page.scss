@@ -15,7 +15,7 @@
   img {
     animation: zoom-rotate-fade 3s ease-in-out both;
     border-radius: 50%;
-    width: 320px;
+    width: 400px;
   }
 
   h1,
@@ -28,13 +28,14 @@
   h1 {
     color: #d9d9d9;
     font-weight: 400;
-    font-size: 25px;
+    font-size: 50px;
     margin-top: 20px;
   }
 
   h2 {
     color: #d9d9d9;
-    font-size: 15px;
+    font-size: 40px;
+    text-align: center;
     font-weight: 300;
     margin: auto;
   }

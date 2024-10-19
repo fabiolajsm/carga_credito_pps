@@ -4,7 +4,10 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 20px;
+}
+
+ion-title {
+  font-size: 30px;
 }
 
 .user-info {
@@ -19,13 +22,17 @@
 }
 
 .cookieHeading {
-  font-size: 25px;
-  margin: 20px 0;
+  font-size: 40px;
+}
+
+.credits {
+  font-size: 50px;
+  font-weight: 600;
 }
 
 .button-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
@@ -36,8 +43,14 @@ ion-select {
   width: 100%;
   max-width: 225px;
   margin: auto;
+  font-size: 30px;
+}
+
+ion-select-option {
+  font-size: 30px;
 }
 
 ion-button {
   text-transform: none;
+  font-size: 30px;
 }

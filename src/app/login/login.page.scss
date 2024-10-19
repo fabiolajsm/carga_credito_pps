@@ -1,5 +1,5 @@
 .heading {
-  font-size: 20px;
+  font-size: 50px;
   margin-bottom: 20px;
   margin-top: 50px;
   text-align: center;
@@ -10,24 +10,28 @@ form {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  width: 300px;
+  width: 380px;
   margin: auto;
 }
 
 ion-input {
   margin-bottom: 15px;
   width: 100%;
+  font-size: 30px;
+  text-align: center;
 }
 
 ion-button {
   width: 100%;
   margin-top: 10px;
   text-transform: none;
+  font-size: 35px;
+  padding: 10px;
 }
 
 p {
   text-align: center;
-  font-size: 15px;
+  font-size: 40px;
 }
 
 div > button {
@@ -39,6 +43,7 @@ div > button {
   padding: 10px 15px;
   cursor: pointer;
   transition: background-color 0.3s;
+  font-size: 30px;
 }
 
 div > button:hover {

@@ -10,8 +10,9 @@
 <ion-content [fullscreen]="true" class="centered-content">
   <div *ngIf="user" class="user-info card">
     <img src="assets/tarjeta.png" alt="imagen tarjeta" class="card-image" />
-    <p class="cookieHeading">
-      Créditos: {{ user.credito && user.credito > 0 ? user.credito : 0 }}
+    <p class="cookieHeading">Créditos</p>
+    <p class="credits">
+      {{ user.credito && user.credito > 0 ? user.credito : 0 }}
     </p>
 
     <ion-select
@@ -41,7 +42,7 @@
     </div>
 
     <div *ngIf="scanning" class="scanner-container">
-      <p>Escanea el código QR</p>
+      <p class="cookieHeading">Escanea el código QR</p>
       <qr-code
         [value]="scanningMessage"
         size="300"
@@ -57,5 +58,7 @@
   color="#d9d9d9"
   type="ball-grid-beat"
   [fullScreen]="true"
-  ><p style="color: #d9d9d9; font-family: Ubuntu">Cargando...</p>
+  ><p style="color: #d9d9d9; font-family: Ubuntu; font-size: 40px">
+    Cargando...
+  </p>
 </ngx-spinner>
